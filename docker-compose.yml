@@ -1,0 +1,67 @@
+version: '3.7'
+services:
+
+  naming-server:
+    #image: in28min/netflix-eureka-naming-server:0.0.1-SNAPSHOT
+    #build:
+      #context: netflix-eureka-naming-server
+      #dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    restart: always
+    networks:
+      - microservices-network
+
+  productmanufacturer:
+    #image: in28min/currency-exchange-service:0.0.1-SNAPSHOT
+    build:
+      context: productmanufacturer
+      dockerfile: Dockerfile    
+    ports:
+      - "8000:8000"
+    restart: always
+    depends_on:
+      - naming-server
+    networks:
+      - microservices-network
+
+  amazon:
+    #image: in28min/currency-conversion-service:0.0.1-SNAPSHOT
+    build:
+      context: currency-conversion-service
+      dockerfile: Dockerfile    
+    ports:
+      - "8081:8081"
+    restart: always
+    environment:
+      #CURRENCY_EXCHANGE_URI: http://currency-exchange-service:8000
+      
+    depends_on:
+      
+      - naming-server
+      - productmanufacturer
+      
+    networks:
+      - microservices-network
+  
+  
+  Flipkart:
+    #image: in28min/currency-conversion-service:0.0.1-SNAPSHOT
+    build:
+      context: currency-conversion-service
+      dockerfile: Dockerfile    
+    ports:
+      - "8082:8082"
+    restart: always
+    environment:
+      #CURRENCY_EXCHANGE_URI: http://currency-exchange-service:8000
+      
+    depends_on:
+      - naming-server
+      - productmanufacturer
+    networks:
+      - microservices-network
+  
+# Networks to be created to facilitate communication between containers
+networks:
+  microservices-network:
